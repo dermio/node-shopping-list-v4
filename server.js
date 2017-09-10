@@ -115,3 +115,75 @@ app.delete('/recipes/:id', (req, res) => {
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Your app is listening on port ${process.env.PORT || 8080}`);
 });
+
+
+
+// My Code PUT endpoint for /recipes
+app.put('/recipes/:id', jsonParser, (req, res) => {
+  let requiredFields = ['name', 'ingredients', 'id'];
+
+  for (let i = 0; i < requiredFields; i++) {
+    let field = requiredFields[i];
+    if (!(field in requiredFields)) {
+      let message = `Missing \`${field}\` in request body`;
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+
+  if (req.params.id !== req.body.id) {
+    let message = `Request path id (${req.params.id}) and request body id (${req.body.id}) must match`;
+    console.error(message);
+    return res.status(400).send(message);
+  }
+
+  console.log(`Updating recipes item \`${req.params.id}\``);
+  Recipes.update({
+    id: req.params.id,
+    name: req.body.name,
+    ingredients: req.body.ingredients
+  });
+
+  res.status(204).end();
+});
+
+// lines 129 and 136, why is it console.error() and not console.log()?
+// line 142, difference betweeen req.params.id and req.body.id?
+// lines 142-144, why are some values req.params and some req.body?
+
+// line 147, what is res.status(204).END()?
+
+
+
+/* Thinkful's solution
+
+// when PUT request comes in with updated recipe, ensure has
+// required fields. also ensure that recipe id in url path, and
+// recipe id in updated item object match. if problems with any
+// of that, log error and send back status code 400. otherwise
+// call `Recipes.updateItem` with updated recipe.
+app.put('/recipes/:id', jsonParser, (req, res) => {
+  const requiredFields = ['name', 'ingredients', 'id'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+  if (req.params.id !== req.body.id) {
+    const message = `Request path id (${req.params.id}) and request body id (${req.body.id}) must match`;
+    console.error(message);
+    return res.status(400).send(message);
+  }
+  console.log(`Updating recipe \`${req.params.id}\``);
+  Recipes.update({
+    id: req.params.id,
+    name: req.body.name,
+    ingredients: req.body.ingredients
+  });
+  res.status(204).end();
+});
+
+*/
